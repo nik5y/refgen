@@ -7,8 +7,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import pages.Home;
 
 import java.util.concurrent.TimeUnit;
@@ -42,26 +45,34 @@ public class CiteThisForMeTests {
         }
     }
 
-    public void navigate(WebDriver driver) {
+    public void setCitationStyle(WebDriver driver, String citationStyle) {
 
         Home homePage = PageFactory.initElements(driver, Home.class);
-//        showCookies();
+//        homePage.removeAds(driver);
         homePage.clickAcceptCookiesButton();
-//        showCookies();
 
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("window.scrollBy(0,350)", "");
 
         homePage.clickMoreCiteOptions();
-        homePage.inputMoreCiteOptions("Vancouver");
-        homePage.clickMoreCiteOptionsFirstResult(driver, "Vancouver");
+        homePage.inputMoreCiteOptions(citationStyle);
+        homePage.removeAds(driver);
+        homePage.clickMoreCiteOptionsFirstResult(driver, citationStyle);
 
-        homePage.clickJournal();
-//        Journal not found alert
-//        homePage.inputJournalSearch("doi.org/10.1038/nm.4335doi.org/10.1038/nm.4335doi.org/10.1038/nm.4335");
+    }
 
-        homePage.inputJournalSearch("https://doi.org/10.1093/jn/128.11.1845");
+    public void addJournalCitation(WebDriver driver, String journalIdentifier) throws InterruptedException {
 
+
+        Home homePage = PageFactory.initElements(driver, Home.class);
+//        Thread.sleep(3000);
+        homePage.waitForElementToBeClickable(driver, homePage.btn_journal, "//span[contains(text(),'Journal')]");
+        homePage.removeAds(driver);
+        homePage.clickJournal(driver);
+
+        homePage.waitForElementToBeClickable(driver, homePage.inp_journalSearch, "//input[@id='jrQry']");
+        homePage.inputJournalSearch(journalIdentifier);
+//        homePage.removeAds(driver);
 //        if (!(homePage.isJournalNotMatched() | homePage.isJournalNotFound())) {
 //            System.out.println("Journal found");
 ////            js.executeScript("window.scrollBy(0,9999)", "");
@@ -69,10 +80,16 @@ public class CiteThisForMeTests {
 //        };
 
         if (homePage.isJournalFound()) {
+            homePage.waitForElementToBeClickable(driver, homePage.btn_addReference, "//button[contains(text(),'Add reference')]");
+            homePage.removeAds(driver);
             homePage.clickAddReference();
             homePage.clickAddNewReference();
         }
+    }
 
+    public void goToBibliographyFromSourceSelect(WebDriver driver) {
+        Home homePage = PageFactory.initElements(driver, Home.class);
+        homePage.clickBackToBibliographyButton(driver);
     }
 
     public static void close(WebDriver driver) throws InterruptedException {

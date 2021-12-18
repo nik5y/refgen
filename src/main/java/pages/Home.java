@@ -1,12 +1,11 @@
 package pages;
 
-import org.openqa.selenium.ElementNotVisibleException;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.util.List;
 
 public class Home {
 
@@ -23,9 +22,6 @@ public class Home {
 
     @FindBy(xpath = "//body/div[2]/div[1]/div[2]/div[2]/div[5]/div[2]/div[1]/div[1]/div[2]/div[1]/a[1]")
     public WebElement btn_moreCiteOptionsFirstResult;
-
-    @FindBy(xpath = "//span[contains(text(),'Journal')]")
-    public WebElement btn_journal;
 
     @FindBy(xpath = "//input[@id='jrQry']")
     public WebElement inp_journalSearch;
@@ -45,6 +41,15 @@ public class Home {
     @FindBy(xpath = "//div[contains(text(), 'Please double-check the journal details below and add to them if required.')]")
     public WebElement elem_journalFoundAlert;
 
+    @FindBy(xpath = "//span[contains(text(),'Journal')]")
+    public WebElement btn_journal;
+
+    @FindBy(xpath = "//h3[contains(text(), 'Reference limit approaching')]")
+    public WebElement elem_referenceLimitApproaching;
+
+    @FindBy(xpath = "//body/div[2]/div[1]/div[2]/div[2]/div[5]/a[1]")
+    public WebElement btn_backToBibliography;
+
     public void clickAcceptCookiesButton() {
         btn_acceptCookies.click();
     }
@@ -63,8 +68,17 @@ public class Home {
         btn_moreCiteOptionsFirstResult.click();
     }
 
-    public void clickJournal() {
-        btn_journal.click();
+    public void clickJournal(WebDriver driver) {
+
+        try {
+            new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(btn_journal));
+            btn_journal.click();
+            System.out.println("journal clicked");
+        } catch (StaleElementReferenceException e) {
+            System.out.println("stale");
+            WebElement btn_journal = driver.findElement(By.xpath("//span[contains(text(),'Journal')]"));
+            btn_journal.click();
+        }
     }
 
     public void inputJournalSearch(String input) {
@@ -112,5 +126,39 @@ public class Home {
             return false;
         }
     }
+
+    public void removeAds(WebDriver driver) {
+        JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+//        List<WebElement> ads = driver.findElements(By.xpath("//iframe[@title='3rd party ad content']"));
+        List<WebElement> ads = driver.findElements(By.xpath("//div[@aria-label='advertisement']"));
+        System.out.println("Ads " + ads.toString());
+        for (WebElement ad : ads) {
+            jsExecutor.executeScript(
+                    "arguments[0].parentNode.removeChild(arguments[0])", ad);
+        }
+    }
+
+    public WebElement waitForElementToBeClickable(WebDriver driver, WebElement element, String elementXpath) {
+
+        try {
+            return new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(element));
+        } catch (StaleElementReferenceException e) {
+            WebElement element1 = driver.findElement(By.xpath(elementXpath));
+            return new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(element1));
+        }
+    }
+
+    public void clickBackToBibliographyButton(WebDriver driver) {
+        try {
+            btn_backToBibliography.click();
+//            new Actions(driver).sendKeys(Keys.ENTER).build().perform();
+            driver.switchTo().alert().accept();
+
+        } catch (UnhandledAlertException e) {
+            driver.switchTo().alert().accept();
+        }
+    }
+
+
 
 }
