@@ -50,6 +50,12 @@ public class Home {
     @FindBy(xpath = "//body/div[2]/div[1]/div[2]/div[2]/div[5]/a[1]")
     public WebElement btn_backToBibliography;
 
+    @FindBy(xpath ="//body/div[2]/div[1]/div[2]/div[2]/div[3]/div[1]/div[3]/a[1]")
+    public WebElement btn_copyAndPasteBibliography;
+
+    @FindBy(xpath = "//body/div[2]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]")
+    public WebElement elem_bibliographyText;
+
     public void clickAcceptCookiesButton() {
         btn_acceptCookies.click();
     }
@@ -57,6 +63,7 @@ public class Home {
     public void clickMoreCiteOptions() {
 //        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOf(btn_moreCiteOptions)).click();
     btn_moreCiteOptions.click();
+//    System.out.println("check "+ btn_moreCiteOptions.getAttribute("xpath"));
     }
 
     public void inputMoreCiteOptions(String input) {
@@ -73,9 +80,9 @@ public class Home {
         try {
             new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(btn_journal));
             btn_journal.click();
-            System.out.println("journal clicked");
+//            System.out.println("journal clicked");
         } catch (StaleElementReferenceException e) {
-            System.out.println("stale");
+//            System.out.println("stale");
             WebElement btn_journal = driver.findElement(By.xpath("//span[contains(text(),'Journal')]"));
             btn_journal.click();
         }
@@ -131,20 +138,20 @@ public class Home {
         JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
 //        List<WebElement> ads = driver.findElements(By.xpath("//iframe[@title='3rd party ad content']"));
         List<WebElement> ads = driver.findElements(By.xpath("//div[@aria-label='advertisement']"));
-        System.out.println("Ads " + ads.toString());
+//        System.out.println("Ads " + ads.toString());
         for (WebElement ad : ads) {
             jsExecutor.executeScript(
                     "arguments[0].parentNode.removeChild(arguments[0])", ad);
         }
     }
 
-    public WebElement waitForElementToBeClickable(WebDriver driver, WebElement element, String elementXpath) {
+    public WebElement waitForElementToBeClickable(WebDriver driver, int timeoutSeconds, WebElement element, String elementXpath) {
 
         try {
-            return new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(element));
+            return new WebDriverWait(driver, timeoutSeconds).until(ExpectedConditions.elementToBeClickable(element));
         } catch (StaleElementReferenceException e) {
             WebElement element1 = driver.findElement(By.xpath(elementXpath));
-            return new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(element1));
+            return new WebDriverWait(driver, timeoutSeconds).until(ExpectedConditions.elementToBeClickable(element1));
         }
     }
 
@@ -159,6 +166,18 @@ public class Home {
         }
     }
 
+    public void clickCopyAndPasteBibliography(WebDriver driver) {
+        try {
+            btn_copyAndPasteBibliography.click();
+        } catch (StaleElementReferenceException e) {
+//            System.out.println("stale");
+            WebElement btn_copyAndPasteBibliography = driver.findElement(By.xpath("//body/div[2]/div[1]/div[2]/div[2]/div[3]/div[1]/div[3]/a[1]"));
+            btn_copyAndPasteBibliography.click();
+        }
+    }
 
+    public String getBibliographyText() {
+        return elem_bibliographyText.getText();
+    }
 
 }

@@ -21,7 +21,8 @@ public class CiteThisForMeTests {
 //    public static WebDriver driver;
 
     public static WebDriver init() throws Exception {
-        WebDriver driver = WebDriverFactory.createWebDriver();
+        WebDriverFactory factory = new WebDriverFactory();
+        WebDriver driver = factory.createWebDriver();
         return driver;
     }
 
@@ -66,11 +67,11 @@ public class CiteThisForMeTests {
 
         Home homePage = PageFactory.initElements(driver, Home.class);
 //        Thread.sleep(3000);
-        homePage.waitForElementToBeClickable(driver, homePage.btn_journal, "//span[contains(text(),'Journal')]");
+        homePage.waitForElementToBeClickable(driver, 20, homePage.btn_journal, "//span[contains(text(),'Journal')]");
         homePage.removeAds(driver);
         homePage.clickJournal(driver);
 
-        homePage.waitForElementToBeClickable(driver, homePage.inp_journalSearch, "//input[@id='jrQry']");
+        homePage.waitForElementToBeClickable(driver, 20, homePage.inp_journalSearch, "//input[@id='jrQry']");
         homePage.inputJournalSearch(journalIdentifier);
 //        homePage.removeAds(driver);
 //        if (!(homePage.isJournalNotMatched() | homePage.isJournalNotFound())) {
@@ -80,7 +81,7 @@ public class CiteThisForMeTests {
 //        };
 
         if (homePage.isJournalFound()) {
-            homePage.waitForElementToBeClickable(driver, homePage.btn_addReference, "//button[contains(text(),'Add reference')]");
+            homePage.waitForElementToBeClickable(driver, 20, homePage.btn_addReference, "//button[contains(text(),'Add reference')]");
             homePage.removeAds(driver);
             homePage.clickAddReference();
             homePage.clickAddNewReference();
@@ -90,11 +91,13 @@ public class CiteThisForMeTests {
     public void goToBibliographyFromSourceSelect(WebDriver driver) {
         Home homePage = PageFactory.initElements(driver, Home.class);
         homePage.clickBackToBibliographyButton(driver);
+
+        homePage.clickCopyAndPasteBibliography(driver);
+
+        System.out.println(homePage.getBibliographyText());
     }
 
-    public static void close(WebDriver driver) throws InterruptedException {
-
-        Thread.sleep(4000);
+    public static void close(WebDriver driver) {
         driver.quit();
     }
 
